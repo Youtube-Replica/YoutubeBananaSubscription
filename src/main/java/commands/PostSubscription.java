@@ -1,4 +1,4 @@
-package Commands.Post;
+package commands;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -6,13 +6,12 @@ import com.rabbitmq.client.Envelope;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import subscriptionsApp.Model.Subscriptions;
-import userApp.commands.Command;
+import Model.Subscriptions;
 
 import java.io.IOException;
 import java.util.HashMap;
 
-public class PostSubscriptions extends Command{
+public class PostSubscription extends Command{
     public static int id = 0;
     public static int subID = 0;
     public void execute() {

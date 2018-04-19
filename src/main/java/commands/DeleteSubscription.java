@@ -1,4 +1,4 @@
-package Commands.Delete;
+package commands;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -7,12 +7,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import Model.Subscriptions;
-import Commands.Command;
 
 import java.io.IOException;
 import java.util.HashMap;
 
-public class DeleteSubscriptions extends Command {
+public class DeleteSubscription extends Command {
     public static int id = 0;
     public static int subID = 0;
     public void execute() {
