@@ -27,8 +27,6 @@ public class SubscriptionService {
 
             channel.queueDeclare(RPC_QUEUE_NAME, false, false, false, null);
 
-            channel.basicQos(1);
-
             System.out.println(" [x] Awaiting RPC requests");
 
             Consumer consumer = new DefaultConsumer(channel) {
@@ -44,18 +42,17 @@ public class SubscriptionService {
 
                     try {
                         String message = new String(body, "UTF-8");
+//                        Command cmd = (Command) Class.forName("commands."+ getCommand(message)).newInstance();
                         Command cmd = (Command) Class.forName("commands."+getCommand(message)).newInstance();
+                        System.out.println("");
                         HashMap<String, Object> props = new HashMap<String, Object>();
                         props.put("channel", channel);
                         props.put("properties", properties);
                         props.put("replyProps", replyProps);
                         props.put("envelope", envelope);
                         props.put("body", message);
-
                         cmd.init(props);
-//                        cmd1.init(props);
                         executor.submit(cmd);
-//                        executor.submit(cmd1);
                     } catch (RuntimeException e) {
                         System.out.println(" [.] " + e.toString());
                     } catch (IllegalAccessException e) {
@@ -74,16 +71,18 @@ public class SubscriptionService {
                 }
             };
 
-            channel.basicConsume(RPC_QUEUE_NAME, false, consumer);
+            channel.basicConsume(RPC_QUEUE_NAME, true, consumer);
         } catch (IOException | TimeoutException e) {
             e.printStackTrace();
         }
 
     }
+
     public static String getCommand(String message) throws ParseException {
         JSONParser parser = new JSONParser();
         JSONObject messageJson = (JSONObject) parser.parse(message);
         String result = messageJson.get("command").toString();
         return result;
     }
+
 }
