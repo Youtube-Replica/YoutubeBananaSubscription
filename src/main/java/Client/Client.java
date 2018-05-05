@@ -60,7 +60,7 @@ public class Client {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Client.Client c = new Client.Client();
+        Client c = new Client();
         new Thread(() -> {
             try {
                 c.run();
