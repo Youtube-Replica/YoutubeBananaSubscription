@@ -1,35 +1,45 @@
 package model;
 
+import Client.Client;
 import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
+import io.netty.buffer.Unpooled;
+import io.netty.util.CharsetUtil;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 
 public class Subscription {
+    static ArangoDB arangoDB;
+    static Subscription instance = new Subscription();
     static String dbName = "scalable";
     static String collectionName = "subscription";
+
+    private Subscription(){
+        arangoDB = new ArangoDB.Builder().build();
+    }
+
+    public static Subscription getInstance(){
+        return Subscription.instance;
+    }
+
+    public void setDB(int i){
+        arangoDB = new ArangoDB.Builder().maxConnections(i).build();
+    }
     //Gets channels' info subscribed by user ID(user ID = _key and maps to array of channels' IDs)
     public static String getSubscriptionByID(int id) {
-        ArangoDB arangoDB = new ArangoDB.Builder().build();
-
         JSONObject subscriptionObjectM = new JSONObject();
         JSONArray subscriptionArray = new JSONArray();
 
-        //haygeely id harod b list ids
         try {
-            System.out.println("in try");
             BaseDocument myDocument = arangoDB.db(dbName).collection(collectionName).getDocument("" + id,
                     BaseDocument.class);
 
             if(myDocument != null){
                 ArrayList<Integer> ids = new ArrayList<Integer>();
-                System.out.println("arraylist");
-
                 ids = (ArrayList) myDocument.getAttribute("id-sub");
-                System.out.println("Ids found:" + ids);
 
                 for (int i = 0; i < ids.size(); i++) {
                     try {
@@ -37,8 +47,6 @@ public class Subscription {
                                 BaseDocument.class);
                         if(myDocument2 != null){
                             JSONObject subscriptionObject = new JSONObject();
-
-                            System.out.println("myDoc 2" + myDocument2);
 
                             subscriptionObject.put("channel_id",ids.get(i));
                             subscriptionObject.put("info",myDocument2.getAttribute("info"));
@@ -52,6 +60,7 @@ public class Subscription {
 
                     }
                     catch (ArangoDBException e) {
+                        Client.serverChannel.writeAndFlush(Unpooled.copiedBuffer("Error> Failed to get document: myKey; " + e.getMessage(), CharsetUtil.UTF_8));
                         System.err.println("Failed to get document: myKey; " + e.getMessage());
                     }
                 }
@@ -59,17 +68,15 @@ public class Subscription {
             }
 
         } catch (ArangoDBException e) {
+            Client.serverChannel.writeAndFlush(Unpooled.copiedBuffer("Error> Failed to get document: myKey; " + e.getMessage(), CharsetUtil.UTF_8));
             System.err.println("Failed to get document: myKey; " + e.getMessage());
         }
-
 
         return subscriptionObjectM.toString();
 
     }
     //Add a new channel subscription to user ID (add to the array of channels)
     public static String postSubscriptionByID(int id, int subID){
-        ArangoDB arangoDB = new ArangoDB.Builder().build();
-
         ArrayList<Integer> ids = new ArrayList<>();
         //Create Document
         if(arangoDB.db(dbName).collection(collectionName).getDocument("" + id,
@@ -80,8 +87,10 @@ public class Subscription {
             myObject.addAttribute("id-sub", ids);
             try {
                 arangoDB.db(dbName).collection(collectionName).insertDocument(myObject);
+                Client.serverChannel.writeAndFlush(Unpooled.copiedBuffer("Information> Document created ", CharsetUtil.UTF_8));
                 System.out.println("Document created");
             } catch (ArangoDBException e) {
+                Client.serverChannel.writeAndFlush(Unpooled.copiedBuffer("Error> Failed to create document " + e.getMessage(), CharsetUtil.UTF_8));
                 System.err.println("Failed to create document. " + e.getMessage());
             }
             return true+"";
@@ -99,10 +108,7 @@ public class Subscription {
     }
 
     public static String deleteSubscriptionByID(int id, int subID){
-        ArangoDB arangoDB = new ArangoDB.Builder().build();
         ArrayList<Long> ids = new ArrayList<>();
-        //Delete sub from Document
-        //Case 1: not the only subscription
         BaseDocument myDocument2 = arangoDB.db(dbName).collection(collectionName).getDocument("" + id,
                 BaseDocument.class);
         if(myDocument2!=null){
@@ -112,7 +118,6 @@ public class Subscription {
             arangoDB.db(dbName).collection(collectionName).deleteDocument("" + id);
             arangoDB.db(dbName).collection(collectionName).insertDocument(myDocument2);
         }
-
 
         return true+"";
     }

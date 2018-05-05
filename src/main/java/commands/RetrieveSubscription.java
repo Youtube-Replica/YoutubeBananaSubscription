@@ -14,6 +14,7 @@ import java.util.HashMap;
 
 public class RetrieveSubscription extends Command {
     public static int id = 0;
+
     public void execute() {
         HashMap<String, Object> props = parameters;
 
@@ -39,42 +40,4 @@ public class RetrieveSubscription extends Command {
             e.printStackTrace();
         }
     }
-//   public static void main(String [] argv) {
-//        ArangoDB arangoDB = new ArangoDB.Builder().build();
-//        String dbName = "subscriptions";
-//        String collectionName = "firstSubscription";
-////        int idRead = id;
-//
-//        //Read Document
-//        //haygeely id harod b list ids
-//        try {
-//            BaseDocument myDocument = arangoDB.db(dbName).collection(collectionName).getDocument(""+id,
-//                    BaseDocument.class);
-//            System.out.println("Key: " + myDocument.getKey());
-//            System.out.println("Attribute a: " + myDocument.getAttribute("IDs"));
-//        } catch (ArangoDBException e) {
-//            System.err.println("Failed to get document: myKey; " + e.getMessage());
-//        }
-//
-////        try {
-////            String query = "FOR t IN firstSubscription FILTER t.name == @name RETURN t";
-////            Map<String, Object> bindVars = new MapBuilder().put("name", "Homer").get();
-////
-////            ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(query, bindVars, null,
-////                    BaseDocument.class);
-////
-////            for (; cursor.hasNext();) {
-////                System.out.println("Key: " + cursor.next());
-////                // TODO
-////            }
-////
-//////            cursor.forEachRemaining(aDocument -> {
-//////                System.out.println("Key: " + aDocument.getKey());
-//////            });
-////        } catch (ArangoDBException e) {
-////            System.err.println("Failed to execute query. " + e.getMessage());
-////        }
-////        return dbName;
-//    }
-
 }
