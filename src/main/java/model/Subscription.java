@@ -14,8 +14,8 @@ import java.util.ArrayList;
 public class Subscription {
     static ArangoDB arangoDB;
     static Subscription instance = new Subscription();
-    static String dbName = "scalable";
-    static String collectionName = "subscription";
+    static String dbName = "subscriptions";
+    static String collectionName = "firstSubscription";
 
     private Subscription(){
         arangoDB = new ArangoDB.Builder().build();

@@ -33,7 +33,7 @@ public class SubscriptionService extends ServiceInterface{
 
             channel.queueDeclare(RPC_QUEUE_NAME, false, false, false, null);
 
-            Client.serverChannel.writeAndFlush(Unpooled.copiedBuffer("Information> [x] Awaiting RPC requests ", CharsetUtil.UTF_8));
+//            Client.serverChannel.writeAndFlush(Unpooled.copiedBuffer("Information> [x] Awaiting RPC requests ", CharsetUtil.UTF_8));
             System.out.println(" [x] Awaiting RPC requests");
 
             Consumer consumer = new DefaultConsumer(channel) {
